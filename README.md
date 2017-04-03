@@ -2,27 +2,31 @@
 
 Research project of Ansible Lookups 
 
+Changes:
+- for several components removed dependencies to Ansible templates and loaders
+
+
 ## How to use from command line
 
 ```shell
-$ lookups env 
+$ lookups <lookup> <terms> <params> <kwargs> 
 ```
 
-## Lookups
+## Lookups status
 
 Name                |   Status                     
 ------------------- | ---------------------------- 
-cartesian           |
-consul_kv           |
-creadstash          |
-csvfile             |
-dict                |
-dig                 |
-dnstxt              |
-env                 |                     
-etcd                |
-file                |
-fileglob            |
+cartesian           |   tested
+consul_kv           |   reviewed but not tested
+creadstash          |   reviewed but not tested 
+csvfile             |   reviewed but not tested
+dict                |   reviewed but not tested
+dig                 |   reviewed but not tested
+dnstxt              |   reviewed but not tested
+env                 |   reviewed but not tested
+etcd                |   reviewed but not tested
+file                |   reviewed but not tested
+fileglob            |   reviewed but not tested
 first_found         |
 flattened           |
 hashi_vault         |
@@ -42,5 +46,5 @@ shelvefile          |
 subelements         |
 template            |
 together            |
-url                 |
+url                 |   reviewed but not tested
 
