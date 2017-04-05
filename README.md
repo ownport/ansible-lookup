@@ -27,8 +27,8 @@ env                 |   reviewed but not tested
 etcd                |   reviewed but not tested
 file                |   reviewed but not tested
 fileglob            |   reviewed but not tested
-first_found         |
-flattened           |
+first_found         |   tested
+flattened           |   
 hashi_vault         |
 indexed_item        |
 ini                 |

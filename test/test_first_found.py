@@ -1,32 +1,29 @@
 
-from lookups.lookup import first_found
+import pytest
 
+from lookups.lookup import first_found
+from lookups.lookup import LookupError
+
+TERMS = [{
+    'files': ['file1', 'file2', 'file3'],
+    'paths': ['path1', 'path2', 'path3']
+}]
 
 def test_first_found_instance():
 
     ff = first_found.LookupModule()
     assert isinstance(ff, first_found.LookupModule)
 
+def test_first_found_no_paths():
 
-# take a list of files and (optionally) a list of paths
-# return the first existing file found in the paths
-# [file1, file2, file3], [path1, path2, path3]
-# search order is:
-# path1/file1
-# path1/file2
-# path1/file3
-# path2/file1
-# path2/file2
-# path2/file3
-# path3/file1
-# path3/file2
-# path3/file3
-def test_first_found_path():
-
-    terms = {
-        'files': ['file1', 'file2', 'file3'],
-        'paths': ['path1', 'path2', 'path3']
-    }
     ff = first_found.LookupModule()
-    assert ff.run(terms=terms) == ''
+    with pytest.raises(LookupError):
+        assert ff.run(terms=TERMS) == ''
 
+def test_first_found_paths(tmpdir):
+
+    p = tmpdir.mkdir("path1").join("file3")
+
+    ff = first_found.LookupModule()
+    with pytest.raises(LookupError):
+        assert ff.run(terms=TERMS) == 'path1/file3'

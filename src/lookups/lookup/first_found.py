@@ -112,7 +112,7 @@ from lookups.utils.boolean import boolean
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables={}, **kwargs):
 
         anydict = False
         skip = False
@@ -155,31 +155,14 @@ class LookupModule(LookupBase):
         else:
             total_search = self._flatten(terms)
 
-        roledir = variables.get('roledir')
         for fn in total_search:
-            try:
-                fn = self._templar.template(fn)
-            except (AnsibleUndefinedVariable, UndefinedError) as e:
-                continue
-
             if os.path.isabs(fn) and os.path.exists(fn):
                 return [fn]
-            else:
-                if roledir is not None:
-                    # check the templates and vars directories too,if they exist
-                    for subdir in ('templates', 'vars', 'files'):
-                        path = self._loader.path_dwim_relative(roledir, subdir, fn)
-                        if os.path.exists(path):
-                            return [path]
-
-                # if none of the above were found, just check the
-                # current filename against the current dir
-                path = self._loader.path_dwim(fn)
-                if os.path.exists(path):
-                    return [path]
         else:
             if skip:
                 return []
             else:
-                raise LookupError("No file was found when using with_first_found. Use the 'skip: true' option to allow this task to be skipped if no files are found")
+                err = "No file was found when using with_first_found. " + \
+                         "Use the 'skip: true' option to allow this task to be skipped if no files are found"
+                raise LookupError(err)
 
