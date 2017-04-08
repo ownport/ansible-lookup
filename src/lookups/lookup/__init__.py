@@ -82,3 +82,34 @@ class LookupBase(with_metaclass(ABCMeta, object)):
             result_string = to_unicode(result_string)
         """
         pass
+
+LOOKUP_ACTIONS = {
+    'cartesian': 'lookups.lookup.cartesian',
+    'consul_kv': 'lookups.lookup.consul_kv',
+    'credstash': 'lookups.lookup.credstash',
+    'csvfile': 'lookups.lookup.csvfile',
+    'dict': 'lookups.lookup.dict',
+    'dig': 'lookups.lookup.dig',
+    'dnstxt': 'lookups.lookup.dnstxt',
+    'env': 'lookups.lookup.env',
+    'etcd': 'lookups.lookup.etcd',
+    'file': 'lookups.lookup.file',
+    'fileglob': 'lookups.lookup.fileglob',
+    'first_found': 'lookups.lookup.first_found',
+    'flattened': 'lookups.lookup.flattened',
+    'hashi_vault': 'lookups.lookup.hashi_vault',
+    'indexed_items': 'lookups.lookup.indexed_items',
+    'ini': 'lookups.lookup.ini',
+    'items': 'lookups.lookup.items',
+    'lines': 'lookups.lookup.lines',
+    'nested': 'lookups.lookup.nested',
+    'password': 'lookups.lookup.password',
+    'pipe': 'lookups.lookup.pipe',
+    'random_choice': 'lookups.lookup.random_choice',
+    'redis_kv': 'lookups.lookup.redis_kv',
+    'sequence': 'lookups.lookup.sequence',
+    'shelvefile': 'lookups.lookup.shelvefile',
+    'subelements': 'lookups.lookup.subelements',
+    'together': 'lookups.lookup.together',
+    'url': 'lookups.lookup.url',
+}

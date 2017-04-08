@@ -32,7 +32,7 @@ flattened           |   tested
 hashi_vault         |   reviewed but not tested
 indexed_item        |   tested
 ini                 |   reviewed but not tested
-inventory_hostname  |   review is required
+inventory_hostname  |   removed
 items               |   tested, can be merged with `flattened`
 lines               |   reviewed but not tested
 list                |   removed
