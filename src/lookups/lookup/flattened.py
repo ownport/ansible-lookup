@@ -3,7 +3,7 @@ __metaclass__ = type
 
 from lookups.lookup import LookupError
 from lookups.lookup import LookupBase
-from lookups.utils.listify import listify_lookup_plugin_terms
+
 
 class LookupModule(LookupBase):
 
@@ -28,13 +28,6 @@ class LookupModule(LookupBase):
                 # ignore undefined items
                 break
 
-            if isinstance(term, basestring):
-                # convert a variable to a list
-                term2 = listify_lookup_plugin_terms(term, templar=self._templar, loader=self._loader)
-                # but avoid converting a plain string to a list of one string
-                if term2 != [ term ]:
-                    term = term2
-
             if isinstance(term, list):
                 # if it's a list, check recursively for items that are a list
                 term = self._do_flatten(term, variables)
@@ -45,10 +38,10 @@ class LookupModule(LookupBase):
         return ret
 
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
 
         if not isinstance(terms, list):
-            raise LookupError("with_flattened expects a list")
+            raise LookupError("flattened expects a list")
 
         return self._do_flatten(terms, variables)
 

@@ -1,23 +1,6 @@
-# (c) 2012, Jan-Piet Mens <jpmens(at)gmail.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import os
 import re
 
 HAVE_REDIS=False
@@ -27,8 +10,8 @@ try:
 except ImportError:
     pass
 
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
+from lookups.lookup import LookupError
+from lookups.lookup import LookupBase
 
 # ==============================================================
 # REDISGET: Obtain value from a GET on a Redis key. Terms
@@ -38,10 +21,10 @@ from ansible.plugins.lookup import LookupBase
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
 
         if not HAVE_REDIS:
-            raise AnsibleError("Can't LOOKUP(redis_kv): module redis is not installed")
+            raise LookupError("Can't LOOKUP(redis_kv): module redis is not installed")
 
         ret = []
         for term in terms:
@@ -59,7 +42,7 @@ class LookupModule(LookupBase):
                 host = m.group('host')
                 port = int(m.group('port'))
             except AttributeError:
-                raise AnsibleError("Bad URI in redis lookup")
+                raise LookupError("Bad URI in redis lookup")
 
             try:
                 conn = redis.Redis(host=host, port=port)

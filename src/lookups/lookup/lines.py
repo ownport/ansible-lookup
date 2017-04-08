@@ -1,30 +1,14 @@
-# (c) 2012, Daniel Hokka Zakrisson <daniel@hozac.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import subprocess
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
+from lookups.lookup import LookupError
+from lookups.lookup import LookupBase
+
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
 
         ret = []
         for term in terms:
@@ -33,5 +17,5 @@ class LookupModule(LookupBase):
             if p.returncode == 0:
                 ret.extend(stdout.splitlines())
             else:
-                raise AnsibleError("lookup_plugin.lines(%s) returned %d" % (term, p.returncode))
+                raise LookupError("lookup.lines(%s) returned %d" % (term, p.returncode))
         return ret

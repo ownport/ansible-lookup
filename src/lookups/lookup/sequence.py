@@ -1,27 +1,11 @@
-# (c) 2013, Jayson Vantuyl <jayson@aggressive.ly>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from re import compile as re_compile, IGNORECASE
 
-from ansible.errors import AnsibleError
-from ansible.parsing.splitter import parse_kv
-from ansible.plugins.lookup import LookupBase
+from lookups.lookup import LookupError
+from lookups.parsing.splitter import parse_kv
+from lookups.lookup import LookupBase
 
 # shortcut format
 NUM = "(0?x?[0-9a-f]+)"
@@ -95,14 +79,14 @@ class LookupModule(LookupBase):
                 arg_cooked = int(arg_raw, 0)
                 setattr(self, arg, arg_cooked)
             except ValueError:
-                raise AnsibleError(
+                raise LookupError(
                     "can't parse arg %s=%r as integer"
                         % (arg, arg_raw)
                 )
             if 'format' in args:
                 self.format = args.pop("format")
         if args:
-            raise AnsibleError(
+            raise LookupError(
                 "unrecognized arguments to with_sequence: %r"
                 % args.keys()
             )
@@ -119,17 +103,17 @@ class LookupModule(LookupBase):
             try:
                 start = int(start, 0)
             except ValueError:
-                raise AnsibleError("can't parse start=%s as integer" % start)
+                raise LookupError("can't parse start=%s as integer" % start)
         if end is not None:
             try:
                 end = int(end, 0)
             except ValueError:
-                raise AnsibleError("can't parse end=%s as integer" % end)
+                raise LookupError("can't parse end=%s as integer" % end)
         if stride is not None:
             try:
                 stride = int(stride, 0)
             except ValueError:
-                raise AnsibleError("can't parse stride=%s as integer" % stride)
+                raise LookupError("can't parse stride=%s as integer" % stride)
 
         if start is not None:
             self.start = start
@@ -142,9 +126,9 @@ class LookupModule(LookupBase):
 
     def sanity_check(self):
         if self.count is None and self.end is None:
-            raise AnsibleError( "must specify count or end in with_sequence")
+            raise LookupError( "must specify count or end in with_sequence")
         elif self.count is not None and self.end is not None:
-            raise AnsibleError( "can't specify both count and end in with_sequence")
+            raise LookupError( "can't specify both count and end in with_sequence")
         elif self.count is not None:
             # convert count to end
             if self.count != 0:
@@ -155,11 +139,11 @@ class LookupModule(LookupBase):
                 self.stride = 0
             del self.count
         if self.stride > 0 and self.end < self.start:
-            raise AnsibleError("to count backwards make stride negative")
+            raise LookupError("to count backwards make stride negative")
         if self.stride < 0 and self.end > self.start:
-            raise AnsibleError("to count forward don't make stride negative")
+            raise LookupError("to count forward don't make stride negative")
         if self.format.count('%') != 1:
-            raise AnsibleError("bad formatting string: %s" % self.format)
+            raise LookupError("bad formatting string: %s" % self.format)
 
     def generate_sequence(self):
         if self.stride >= 0:
@@ -173,11 +157,11 @@ class LookupModule(LookupBase):
                 formatted = self.format % i
                 yield formatted
             except (ValueError, TypeError):
-                raise AnsibleError(
+                raise LookupError(
                     "problem formatting %r with %r" % self.format
                 )
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
         results = []
 
         for term in terms:
@@ -187,16 +171,14 @@ class LookupModule(LookupBase):
                     if not self.parse_simple_args(term):
                         self.parse_kv_args(parse_kv(term))
                 except Exception as e:
-                    raise AnsibleError("unknown error parsing with_sequence arguments: %r. Error was: %s" % (term, e))
+                    raise LookupError("unknown error parsing with_sequence arguments: %r. Error was: %s" % (term, e))
 
                 self.sanity_check()
                 if self.stride != 0:
                     results.extend(self.generate_sequence())
-            except AnsibleError:
+            except LookupError:
                 raise
             except Exception as e:
-                raise AnsibleError(
-                    "unknown error generating sequence: %s" % e
-                )
+                raise LookupError("unknown error generating sequence: %s" % e)
 
         return results

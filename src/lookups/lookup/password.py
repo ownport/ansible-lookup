@@ -1,21 +1,3 @@
-# (c) 2012, Daniel Hokka Zakrisson <daniel@hozac.com>
-# (c) 2013, Javier Candeira <javier@candeira.com>
-# (c) 2013, Maykel Moya <mmoya@speedyrails.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -25,14 +7,14 @@ import random
 
 from string import ascii_letters, digits
 
-from ansible import constants as C
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
-from ansible.parsing.splitter import parse_kv
-from ansible.utils.encrypt import do_encrypt
-from ansible.utils.path import makedirs_safe
+from lookups.lookup import LookupError
+from lookups.lookup import LookupBase
+from lookups.parsing.splitter import parse_kv
+from lookups.utils.encrypt import do_encrypt
+from lookups.utils.path import makedirs_safe
 
 DEFAULT_LENGTH = 20
+DEFAULT_PASSWORD_CHARS = ascii_letters + digits + ".,:-_"
 VALID_PARAMS = frozenset(('length', 'encrypt', 'chars'))
 
 
@@ -57,14 +39,14 @@ def _parse_parameters(term):
             if not term.startswith(relpath):
                 # Likely, the user had a non parameter following a parameter.
                 # Reject this as a user typo
-                raise AnsibleError('Unrecognized value after key=value parameters given to password lookup')
+                raise LookupError('Unrecognized value after key=value parameters given to password lookup')
         # No _raw_params means we already found the complete path when
         # we split it initially
 
     # Check for invalid parameters.  Probably a user typo
     invalid_params = frozenset(params.keys()).difference(VALID_PARAMS)
     if invalid_params:
-        raise AnsibleError('Unrecognized parameter(s) given to password lookup: %s' % ', '.join(invalid_params))
+        raise LookupError('Unrecognized parameter(s) given to password lookup: %s' % ', '.join(invalid_params))
 
     # Set defaults
     params['length'] = int(params.get('length', DEFAULT_LENGTH))
@@ -86,7 +68,7 @@ def _parse_parameters(term):
 
 class LookupModule(LookupBase):
 
-    def random_password(self, length=DEFAULT_LENGTH, chars=C.DEFAULT_PASSWORD_CHARS):
+    def random_password(self, length=DEFAULT_LENGTH, chars=DEFAULT_PASSWORD_CHARS):
         '''
         Return a random password string of length containing only chars.
         NOTE: this was moved from the old ansible utils code, as nothing
@@ -105,7 +87,7 @@ class LookupModule(LookupBase):
         salt_chars = ascii_letters + digits + './'
         return self.random_password(length=8, chars=salt_chars)
 
-    def run(self, terms, variables, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
 
         ret = []
 
@@ -119,7 +101,7 @@ class LookupModule(LookupBase):
                 try:
                     makedirs_safe(pathdir, mode=0o700)
                 except OSError as e:
-                    raise AnsibleError("cannot create the path for the password lookup: %s (error was %s)" % (pathdir, str(e)))
+                    raise LookupError("cannot create the path for the password lookup: %s (error was %s)" % (pathdir, str(e)))
 
                 chars = "".join(getattr(string, c, c) for c in params['chars']).replace('"', '').replace("'", '')
                 password = ''.join(random.choice(chars) for _ in range(params['length']))

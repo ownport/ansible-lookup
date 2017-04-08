@@ -1,27 +1,11 @@
-# (c) 2015, Alejandro Guirao <lekumberri@gmail.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import shelve
 import os
 
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
+from lookups.lookup import LookupError
+from lookups.lookup import LookupBase
 
 class LookupModule(LookupBase):
 
@@ -57,7 +41,7 @@ class LookupModule(LookupBase):
 
             except (ValueError, AssertionError) as e:
                 # In case "file" or "key" are not present
-                raise AnsibleError(e)
+                raise LookupError(e)
 
             file = paramvals['file']
             key = paramvals['key']
@@ -73,11 +57,11 @@ class LookupModule(LookupBase):
                 if path and os.path.exists(path):
                     res = self.read_shelve(path, key)
                     if res is None:
-                        raise AnsibleError("Key %s not found in shelve file %s" % (key, file))
+                        raise LookupError("Key %s not found in shelve file %s" % (key, file))
                     # Convert the value read to string
                     ret.append(str(res))
                     break
             else:
-                raise AnsibleError("Could not locate shelve file in lookup: %s" % file)
+                raise LookupError("Could not locate shelve file in lookup: %s" % file)
 
         return ret

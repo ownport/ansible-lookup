@@ -23,28 +23,28 @@ csvfile             |   reviewed but not tested
 dict                |   reviewed but not tested
 dig                 |   reviewed but not tested
 dnstxt              |   reviewed but not tested
-env                 |   reviewed but not tested
+env                 |   tested
 etcd                |   reviewed but not tested
 file                |   reviewed but not tested
 fileglob            |   reviewed but not tested
 first_found         |   tested
-flattened           |   
-hashi_vault         |
-indexed_item        |
-ini                 |
-inventory_hostname  |
-items               |
-lines               |
-list                |
-nested              |
-password            |
-pipe                |
-random_choice       |
-redis_kv            |
-sequence            |
-shelvefile          |
-subelements         |
-template            |
-together            |
+flattened           |   tested
+hashi_vault         |   reviewed but not tested
+indexed_item        |   tested
+ini                 |   reviewed but not tested
+inventory_hostname  |   review is required
+items               |   tested, can be merged with `flattened`
+lines               |   reviewed but not tested
+list                |   removed
+nested              |   tested
+password            |   reviewed but not tested
+pipe                |   reviewed but not tested
+random_choice       |   reviewed but not tested
+redis_kv            |   reviewed but not tested
+sequence            |   reviewed but not tested
+shelvefile          |   reviewed but not tested
+subelements         |   reviewed but not tested
+template            |   removed
+together            |   reviewed but not tested
 url                 |   reviewed but not tested
 
