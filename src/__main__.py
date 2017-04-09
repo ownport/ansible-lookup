@@ -10,8 +10,14 @@ from lookups.lookup import LOOKUP_ACTIONS
 
 def cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--action', required=True, help='Action name')
-    parser.add_argument('--terms', help='lookup terms')
+    subparsers = parser.add_subparsers(title='actions', help='Loolup actions handler')
+
+    parsers = {}
+    for action in LOOKUP_ACTIONS:
+        parsers[action] = subparsers.add_parser(action, help='Action: %s' % action)
+        parsers[action].add_argument('--terms', help='lookup terms as JSON string')
+        parsers[action].set_defaults(action=action)
+
     args = parser.parse_args()
 
     action_module_name = LOOKUP_ACTIONS.get(args.action)
@@ -23,9 +29,10 @@ def cli():
         action_module = __import__(action_module_name, globals(), locals(), 'LookupModule')
     except ImportError as err:
         print('[ERROR] Cannot import action module, %s' % action_module_name)
+        sys.exit(1)
 
     if not args.terms:
-        parser.print_help()
+        parsers[args.action].print_help()
         sys.exit(1)
 
     try:
@@ -34,6 +41,6 @@ def cli():
         print('[ERROR] Cannot parse the terms in JSON format: %s' % args.terms)
         sys.exit(1)
 
-    print(action_module.LookupModule().run(terms=terms))
+    print(json.dumps(action_module.LookupModule().run(terms=terms)))
 
 cli()

@@ -1,5 +1,5 @@
 PYTHON ?= /usr/bin/env python
-PROJECT_NAME_BIN ?= lookups
+PROJECT_NAME_BIN ?= ansible-lookups
 PROJECT_NAME_SRC ?= lookups
 
 clean:
